@@ -22,7 +22,6 @@ jobs:
           echo "Descomprimiendo $ZIP"
           mkdir -p "$RUNNER_TEMP/src"
           unzip -q "$ZIP" -d "$RUNNER_TEMP/src"
-          # Localiza la carpeta que contiene settings.gradle.kts
           SETTINGS=$(find "$RUNNER_TEMP/src" -name "settings.gradle.kts" -not -path "*/__MACOSX/*" | head -n 1)
           if [ -z "$SETTINGS" ]; then
             echo "::error::No se encontró settings.gradle.kts dentro del zip"
@@ -36,8 +35,10 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Instalar Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Preparar Android SDK (ya viene en el runner)
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"
 
       - name: Instalar Gradle 8.7
         uses: gradle/actions/setup-gradle@v4
